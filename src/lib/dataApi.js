@@ -26,12 +26,12 @@ export async function fetchProductsForHome(limit = 6) {
 
 export async function fetchVlogExperiencePosts() {
   if (!firebaseReady) return fallbackExperiencePosts
-  const data = await fsList('vlog_experience_posts', { orderByField: 'created_at', orderDirection: 'desc' })
-  return (data ?? []).sort(sortByCreatedAtDesc)
+  const data = await fsList('vlog_experience_posts', { orderByField: 'sort_order', orderDirection: 'asc' })
+  return (data ?? [])
 }
 
 export async function fetchVlogVideoPosts() {
   if (!firebaseReady) return fallbackVideoPosts
-  const data = await fsList('vlog_video_posts', { orderByField: 'created_at', orderDirection: 'desc' })
-  return (data ?? []).sort(sortByCreatedAtDesc)
+  const data = await fsList('vlog_video_posts', { orderByField: 'sort_order', orderDirection: 'asc' })
+  return (data ?? [])
 }
