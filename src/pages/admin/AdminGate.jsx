@@ -8,13 +8,23 @@ export default function AdminGate() {
   const loc = useLocation()
 
   if (!firebaseReady) {
+    const missing = [
+      !import.meta.env.VITE_FIREBASE_API_KEY && 'API_KEY',
+      !import.meta.env.VITE_FIREBASE_AUTH_DOMAIN && 'AUTH_DOMAIN',
+      !import.meta.env.VITE_FIREBASE_PROJECT_ID && 'PROJECT_ID',
+      !import.meta.env.VITE_FIREBASE_STORAGE_BUCKET && 'STORAGE_BUCKET',
+      !import.meta.env.VITE_FIREBASE_APP_ID && 'APP_ID',
+    ].filter(Boolean)
+
     return (
       <div className="py-14">
         <Container className="lux-glass rounded-3xl p-10">
           <div className="text-sm font-semibold text-slate-900">Firebase not configured</div>
           <div className="mt-2 text-sm text-slate-700">
-            Set the <span className="font-semibold">VITE_FIREBASE_*</span> environment variables in <span className="font-semibold">.env.local</span>
-            to use the admin panel.
+            Current build is missing: <span className="font-mono text-rose-600">{missing.join(', ') || 'none'}</span>
+          </div>
+          <div className="mt-4 text-xs text-slate-500">
+            Note: You must <strong className="text-slate-900">Redeploy</strong> in Vercel after adding environment variables.
           </div>
         </Container>
       </div>
