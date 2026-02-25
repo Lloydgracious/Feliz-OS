@@ -14,6 +14,22 @@ function isYouTubeUrl(url) {
   return u.includes('youtube.com') || u.includes('youtu.be')
 }
 
+function getYouTubeEmbedUrl(url) {
+  if (!url) return ''
+  const u = String(url)
+  // Handle already embedded links
+  if (u.includes('/embed/')) return u
+
+  let videoId = ''
+  if (u.includes('v=')) {
+    videoId = u.split('v=')[1]?.split('&')[0]
+  } else if (u.includes('youtu.be/')) {
+    videoId = u.split('youtu.be/')[1]?.split('?')[0]
+  }
+
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : u
+}
+
 export default function Blog() {
   const [activePost, setActivePost] = useState(null)
 
@@ -76,7 +92,7 @@ export default function Blog() {
                   {isYouTubeUrl(v.url) ? (
                     <iframe
                       className="aspect-video w-full"
-                      src={v.url}
+                      src={getYouTubeEmbedUrl(v.url)}
                       title={v.title}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
@@ -104,39 +120,39 @@ export default function Blog() {
               </div>
             ) : (
               (experiencePosts ?? []).map((p, idx) => (
-              <motion.article
-                key={p.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setActivePost(p)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') setActivePost(p)
-                }}
-                className="lux-glass group cursor-pointer rounded-3xl p-4 transition hover:bg-white/20"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.35, delay: idx * 0.04 }}
-              >
-                <div className="overflow-hidden rounded-2xl">
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                </div>
-
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <div className="rounded-full border border-white/25 bg-white/25 px-3 py-1 text-[11px] font-semibold text-slate-800">
-                    {p.mood}
+                <motion.article
+                  key={p.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivePost(p)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') setActivePost(p)
+                  }}
+                  className="lux-glass group cursor-pointer rounded-3xl p-4 transition hover:bg-white/20"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: idx * 0.04 }}
+                >
+                  <div className="overflow-hidden rounded-2xl">
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
                   </div>
-                  <div className="text-xs text-slate-600">{p.date}</div>
-                </div>
 
-                <div className="mt-3 text-xl text-slate-900">{p.title}</div>
-                <p className="mt-2 text-sm text-slate-700">{p.text}</p>
-              </motion.article>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <div className="rounded-full border border-white/25 bg-white/25 px-3 py-1 text-[11px] font-semibold text-slate-800">
+                      {p.mood}
+                    </div>
+                    <div className="text-xs text-slate-600">{p.date}</div>
+                  </div>
+
+                  <div className="mt-3 text-xl text-slate-900">{p.title}</div>
+                  <p className="mt-2 text-sm text-slate-700">{p.text}</p>
+                </motion.article>
               ))
             )}
           </div>
