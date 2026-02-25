@@ -1,0 +1,24 @@
+﻿remote:            path: admi
+n-tools/serviceAccountKey.jso
+n:1        
+remote:             
+remote:        (?) To push, 
+remove secret from commit(s) 
+or follow this URL to allow 
+the secret.        
+remote:        https://github
+.com/Lloydgracious/Feliz-OS/s
+ecurity/secret-scanning/unblo
+ck-secret/3AAfvXwVhmlBJRwNWKM
+665SABie        
+remote:             
+remote: 
+remote: 
+To https://github.com/Lloydgr
+acious/Feliz-OS.git
+ ! [remote rejected] main -> 
+main (push declined due to 
+repository rule violations)
+error: failed to push some 
+refs to 'https://github.com/L
+loydgracious/Feliz-OS.git'

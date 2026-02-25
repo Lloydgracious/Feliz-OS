@@ -1,0 +1,16 @@
+{
+  "name": "admin-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "set-admin": "node set-admin.js",
+    "seed": "node seed-firestore.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^13.6.1"
+  }
+}
