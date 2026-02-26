@@ -67,7 +67,7 @@ export default function Customize() {
 
   const canNext = useMemo(() => {
     if (active === 0) return selectedKnots.length >= 2 && selectedKnots.length <= 4
-    if (active === 1) return selectedColors.length >= 1 && selectedColors.length <= 2
+    if (active === 1) return selectedColors.length >= 1 && selectedColors.length <= 4
     if (active === 2) return !!rope
     return true
   }, [active, selectedKnots, selectedColors, rope])
@@ -166,8 +166,8 @@ export default function Customize() {
                 {active === 1 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 02</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Choose 1 or 2 colors</h2>
-                    <p className="mt-2 text-sm text-slate-700">Select up to two cord tones to create a beautiful layered or multi-tone look.</p>
+                    <h2 className="mt-2 text-3xl text-slate-900">Choose 1 to 4 colors</h2>
+                    <p className="mt-2 text-sm text-slate-700">Select up to four cord tones to create a beautiful multi-tone look.</p>
 
                     <div className="mt-6">
                       {colorOptions.length > 0 ? (
@@ -182,10 +182,10 @@ export default function Customize() {
                                 onSelect={() => {
                                   if (isSelected) {
                                     setSelectedColors(prev => prev.filter(p => p.id !== c.id))
-                                  } else if (selectedColors.length < 2) {
+                                  } else if (selectedColors.length < 4) {
                                     setSelectedColors(prev => [...prev, c])
                                   } else {
-                                    toast.error('Maximum 2 colors allowed')
+                                    toast.error('Maximum 4 colors allowed')
                                   }
                                 }}
                                 rightNote={formatAddonMMK(c.priceAdd)}
@@ -351,14 +351,16 @@ export default function Customize() {
           </div>
 
           <div className="space-y-6">
-            <BraceletPreview primary={selectedColors[0]} secondary={selectedColors.length > 1 ? selectedColors[1] : selectedColors[0]} knotLabel={summaryLabel} />
+            <BraceletPreview colors={selectedColors} knotLabel={summaryLabel} />
             <div className="lux-glass rounded-[32px] p-6">
               <div className="text-sm font-semibold text-slate-900">Your Selections</div>
               <div className="mt-4 space-y-3">
                 {selectedColors.map((c, idx) => (
                   <div key={idx} className="flex items-center gap-3">
                     <div className="h-6 w-6 rounded-full border border-white/35 shadow-sm" style={{ backgroundColor: c?.hex }} />
-                    <span className="text-xs text-slate-700">{idx === 0 ? 'Primary' : 'Secondary'}: {c?.name}</span>
+                    <span className="text-xs text-slate-700">
+                      {idx === 0 ? 'Primary' : idx === 1 ? 'Secondary' : `Color ${idx + 1}`}: {c?.name}
+                    </span>
                   </div>
                 ))}
                 {rope && (
