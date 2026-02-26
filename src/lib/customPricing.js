@@ -1,6 +1,6 @@
 import { formatMMK } from './utils'
 
-export function calcCustomizationTotal({ base, knots = [], color1, color2, rope, accessory }) {
+export function calcCustomizationTotal({ base, knots = [], colors = [], rope, accessory }) {
   let total = Number(base || 0)
 
   // Sum up all selected knots
@@ -8,8 +8,11 @@ export function calcCustomizationTotal({ base, knots = [], color1, color2, rope,
     if (k?.priceAdd) total += k.priceAdd
   })
 
-  if (color1?.priceAdd) total += color1.priceAdd
-  if (color2?.priceAdd) total += color2.priceAdd
+  // Sum up all selected colors
+  colors.forEach(c => {
+    if (c?.priceAdd) total += c.priceAdd
+  })
+
   if (rope?.priceAdd) total += rope.priceAdd
   if (accessory?.priceAdd) total += accessory.priceAdd
 

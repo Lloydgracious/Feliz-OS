@@ -17,9 +17,8 @@ import { useCart } from '../context/CartContext'
 
 const steps = [
   { key: 'knots', label: 'Knot Styles' },
-  { key: 'color1', label: 'Primary Color' },
+  { key: 'colors', label: 'Color Options' },
   { key: 'rope', label: 'Rope Type' },
-  { key: 'color2', label: 'Secondary Color' },
   { key: 'accessory', label: 'Accessories' },
   { key: 'review', label: 'Review' },
 ]
@@ -34,56 +33,56 @@ export default function Customize() {
   const { data: settings } = useSettings(['base_customization_price'])
 
   const [selectedKnots, setSelectedKnots] = useState([]) // Array of 2-4 knots
-  const [color1, setColor1] = useState(null)
+  const [selectedColors, setSelectedColors] = useState([]) // Array of 1-2 colors
   const [rope, setRope] = useState(null)
-  const [color2, setColor2] = useState(null)
   const [accessory, setAccessory] = useState(null)
 
-  // Initialize colors when data loads if not set
+  // Initialize defaults
   useEffect(() => {
     if (!loading) {
-      if (colorOptions.length > 0) {
-        if (!color1) setColor1(colorOptions[0])
-        if (!color2) setColor2(colorOptions.length > 1 ? colorOptions[1] : colorOptions[0])
+      if (colorOptions.length > 0 && selectedColors.length === 0) {
+        setSelectedColors([colorOptions[0]])
       }
       if (ropeOptions.length > 0 && !rope) {
         setRope(ropeOptions[0])
       }
     }
-  }, [loading, colorOptions, color1, color2, ropeOptions, rope])
+  }, [loading, colorOptions, ropeOptions, rope, selectedColors])
 
   const baseCustomizationPrice = Number(settings?.base_customization_price || 120000)
 
   const chosen = useMemo(() => {
-    return { selectedKnots, color1, rope, color2, accessory }
-  }, [selectedKnots, color1, rope, color2, accessory])
+    return { selectedKnots, selectedColors, rope, accessory }
+  }, [selectedKnots, selectedColors, rope, accessory])
 
   const estimate = useMemo(() => {
     return calcCustomizationTotal({
       base: baseCustomizationPrice,
       knots: selectedKnots,
-      color1,
+      colors: selectedColors,
       rope,
-      color2,
       accessory,
     })
-  }, [baseCustomizationPrice, selectedKnots, color1, rope, color2, accessory])
+  }, [baseCustomizationPrice, selectedKnots, selectedColors, rope, accessory])
 
   const canNext = useMemo(() => {
     if (active === 0) return selectedKnots.length >= 2 && selectedKnots.length <= 4
-    if (active === 1) return !!color1
+    if (active === 1) return selectedColors.length >= 1 && selectedColors.length <= 2
     if (active === 2) return !!rope
-    if (active === 3) return !!color2
     return true
-  }, [active, selectedKnots, color1, rope, color2])
+  }, [active, selectedKnots, selectedColors, rope])
 
   const summaryLabel = useMemo(() => {
     return selectedKnots.map(k => k.name).join(' + ') || '—'
   }, [selectedKnots])
 
+  const colorsLabel = useMemo(() => {
+    return selectedColors.map(c => c.name).join(' + ') || '—'
+  }, [selectedColors])
+
   const meta = useMemo(() => {
-    return `Knots: ${summaryLabel} • Rope: ${rope?.name ?? '—'} • Colors: ${color1?.name ?? '—'} + ${color2?.name ?? '—'} • Acc: ${accessory?.name ?? 'None'}`
-  }, [summaryLabel, rope, color1, color2, accessory])
+    return `Knots: ${summaryLabel} • Colors: ${colorsLabel} • Rope: ${rope?.name ?? '—'} • Acc: ${accessory?.name ?? 'None'}`
+  }, [summaryLabel, colorsLabel, rope, accessory])
 
   if (loading) return <LoadingSpinner label="Loading designer" />
 
@@ -167,21 +166,33 @@ export default function Customize() {
                 {active === 1 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 02</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Select primary color</h2>
-                    <p className="mt-2 text-sm text-slate-700">Choose the dominant cord tone for your piece.</p>
+                    <h2 className="mt-2 text-3xl text-slate-900">Choose 1 or 2 colors</h2>
+                    <p className="mt-2 text-sm text-slate-700">Select your favorite cord tones. You can pick up to two for a layered look.</p>
 
                     <div className="mt-6">
                       {colorOptions.length > 0 ? (
                         <div className="grid gap-3 sm:grid-cols-2">
-                          {colorOptions.map((c) => (
-                            <ColorDot
-                              key={c.id}
-                              color={c}
-                              selected={color1?.id === c.id}
-                              onSelect={setColor1}
-                              rightNote={formatAddonMMK(c.priceAdd)}
-                            />
-                          ))}
+                          {colorOptions.map((c) => {
+                            const isSelected = selectedColors.some(sc => sc.id === c.id)
+                            return (
+                              <ColorDot
+                                key={c.id}
+                                color={c}
+                                selected={isSelected}
+                                onSelect={() => {
+                                  if (isSelected) {
+                                    setSelectedColors(prev => prev.filter(p => p.id !== c.id))
+                                  } else if (selectedColors.length < 2) {
+                                    setSelectedColors(prev => [...prev, c])
+                                  } else {
+                                    toast.error('Maximum 2 colors allowed')
+                                  }
+                                }}
+                                rightNote={formatAddonMMK(c.priceAdd)}
+                              />
+                            )
+                          }
+                          )}
                         </div>
                       ) : (
                         <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
@@ -219,36 +230,6 @@ export default function Customize() {
                 {active === 3 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 04</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Select secondary color</h2>
-                    <p className="mt-2 text-sm text-slate-700">
-                      Choose the accent tone — used for secondary cord detail and binding.
-                    </p>
-
-                    <div className="mt-6">
-                      {colorOptions.length > 0 ? (
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          {colorOptions.map((c) => (
-                            <ColorDot
-                              key={c.id}
-                              color={c}
-                              selected={color2?.id === c.id}
-                              onSelect={setColor2}
-                              rightNote={formatAddonMMK(c.priceAdd)}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                          No accent colors available.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {active === 4 && (
-                  <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Add accessories / coins</h2>
                     <p className="mt-2 text-sm text-slate-700">Select a unique charm or coin to add a personal touch to your design.</p>
                     <div className="mt-6 grid gap-4 grid-cols-2">
@@ -274,9 +255,9 @@ export default function Customize() {
                   </div>
                 )}
 
-                {active === 5 && (
+                {active === 4 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 06</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Review your design</h2>
                     <p className="mt-2 text-sm text-slate-700">
                       Confirm your selections and add your custom creation to the cart.
@@ -296,7 +277,7 @@ export default function Customize() {
                           </div>
                           <div className="flex items-center justify-between gap-4">
                             <dt className="text-slate-600">Colors</dt>
-                            <dd className="font-semibold text-slate-900 text-right">{color1?.name} / {color2?.name}</dd>
+                            <dd className="font-semibold text-slate-900 text-right">{selectedColors.map(c => c.name).join(' / ')}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
                             <dt className="text-slate-600">Accessory</dt>
@@ -370,18 +351,16 @@ export default function Customize() {
           </div>
 
           <div className="space-y-6">
-            <BraceletPreview primary={color1} secondary={color2} knotLabel={summaryLabel} />
+            <BraceletPreview primary={selectedColors[0]} secondary={selectedColors.length > 1 ? selectedColors[1] : selectedColors[0]} knotLabel={summaryLabel} />
             <div className="lux-glass rounded-[32px] p-6">
               <div className="text-sm font-semibold text-slate-900">Your Selections</div>
               <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: color1?.hex }} />
-                  <span className="text-xs text-slate-700">Primary: {color1?.name}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: color2?.hex }} />
-                  <span className="text-xs text-slate-700">Secondary: {color2?.name}</span>
-                </div>
+                {selectedColors.map((c, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: c?.hex }} />
+                    <span className="text-xs text-slate-700">{idx === 0 ? 'Primary' : 'Secondary'}: {c?.name}</span>
+                  </div>
+                ))}
                 {accessory && (
                   <div className="flex items-center gap-3">
                     <img src={accessory.image} className="h-6 w-6 rounded object-cover" />
