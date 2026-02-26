@@ -10,10 +10,14 @@ import { useSettings } from '../../lib/useSettings'
 
 const EMPTY_KNOT = { name: '', meaning: '', description: '', image: '', priceAdd: 0 }
 const EMPTY_COLOR = { name: '', hex: '#000000', priceAdd: 0 }
+const EMPTY_ROPE = { name: '', priceAdd: 0 }
+const EMPTY_ACCESSORY = { name: '', image: '', priceAdd: 0 }
 
 export default function AdminCustomize() {
     const [knots, setKnots] = useState([])
     const [colors, setColors] = useState([])
+    const [ropes, setRopes] = useState([])
+    const [accessories, setAccessories] = useState([])
     const [loading, setLoading] = useState(true)
     const [savingBase, setSavingBase] = useState(false)
 
@@ -28,8 +32,13 @@ export default function AdminCustomize() {
 
     const [knotModal, setKnotModal] = useState(false)
     const [colorModal, setColorModal] = useState(false)
+    const [ropeModal, setRopeModal] = useState(false)
+    const [accessoryModal, setAccessoryModal] = useState(false)
+
     const [draftKnot, setDraftKnot] = useState(EMPTY_KNOT)
     const [draftColor, setDraftColor] = useState(EMPTY_COLOR)
+    const [draftRope, setDraftRope] = useState(EMPTY_ROPE)
+    const [draftAccessory, setDraftAccessory] = useState(EMPTY_ACCESSORY)
     const [editId, setEditId] = useState(null)
 
     async function load() {
@@ -37,8 +46,12 @@ export default function AdminCustomize() {
         try {
             const k = await adminListDocs('customization_knots')
             const c = await adminListDocs('customization_colors')
+            const r = await adminListDocs('customization_ropes')
+            const a = await adminListDocs('customization_accessories')
             setKnots(k || [])
             setColors(c || [])
+            setRopes(r || [])
+            setAccessories(a || [])
         } catch {
             toast.error('Failed to load customization options')
         } finally {
@@ -93,6 +106,54 @@ export default function AdminCustomize() {
         if (!confirm('Delete this color?')) return
         try {
             await adminDeleteDoc('customization_colors', id)
+            toast.success('Deleted')
+            load()
+        } catch {
+            toast.error('Delete failed')
+        }
+    }
+
+    async function saveRope() {
+        if (!draftRope.name) return toast.error('Name is required')
+        const id = editId || `rope-${Date.now()}`
+        try {
+            await adminUpsertDoc('customization_ropes', id, draftRope)
+            toast.success('Rope type saved')
+            setRopeModal(false)
+            load()
+        } catch (e) {
+            toast.error(`Save failed: ${e.message}`)
+        }
+    }
+
+    async function deleteRope(id) {
+        if (!confirm('Delete this rope?')) return
+        try {
+            await adminDeleteDoc('customization_ropes', id)
+            toast.success('Deleted')
+            load()
+        } catch {
+            toast.error('Delete failed')
+        }
+    }
+
+    async function saveAccessory() {
+        if (!draftAccessory.name) return toast.error('Name is required')
+        const id = editId || `acc-${Date.now()}`
+        try {
+            await adminUpsertDoc('customization_accessories', id, draftAccessory)
+            toast.success('Accessory saved')
+            setAccessoryModal(false)
+            load()
+        } catch (e) {
+            toast.error(`Save failed: ${e.message}`)
+        }
+    }
+
+    async function deleteAccessory(id) {
+        if (!confirm('Delete this accessory?')) return
+        try {
+            await adminDeleteDoc('customization_accessories', id)
             toast.success('Deleted')
             load()
         } catch {
@@ -265,6 +326,69 @@ export default function AdminCustomize() {
                 </div>
             </div>
 
+            {/* Rope Types Section */}
+            <div className="lux-glass rounded-3xl p-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="text-sm font-semibold text-slate-900">Rope Thickness</div>
+                        <div className="text-xs text-slate-600">e.g. Thick vs Thin</div>
+                    </div>
+                    <Button onClick={() => { setDraftRope(EMPTY_ROPE); setEditId(null); setRopeModal(true) }}>
+                        <Plus className="h-4 w-4" /> Add Rope
+                    </Button>
+                </div>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {ropes.map((r) => (
+                        <div key={r.id} className="lux-ring flex items-center justify-between rounded-2xl bg-white/40 p-4">
+                            <div>
+                                <div className="font-semibold text-slate-900">{r.name}</div>
+                                <div className="text-xs text-slate-600">+{formatMMK(r.priceAdd)}</div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button onClick={() => { setEditId(r.id); setDraftRope(r); setRopeModal(true) }} className="text-sky-600">
+                                    <Edit2 className="h-3.5 w-3.5" />
+                                </button>
+                                <button onClick={() => deleteRope(r.id)} className="text-rose-600">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Accessories Section */}
+            <div className="lux-glass rounded-3xl p-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="text-sm font-semibold text-slate-900">Accessories / Coins</div>
+                        <div className="text-xs text-slate-600">Beads, charms, coins</div>
+                    </div>
+                    <Button onClick={() => { setDraftAccessory(EMPTY_ACCESSORY); setEditId(null); setAccessoryModal(true) }}>
+                        <Plus className="h-4 w-4" /> Add Accessory
+                    </Button>
+                </div>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {accessories.map((a) => (
+                        <div key={a.id} className="lux-ring flex gap-4 rounded-2xl bg-white/40 p-4">
+                            <img src={a.image} className="h-12 w-12 rounded-lg object-cover bg-white" />
+                            <div className="flex-1 min-w-0">
+                                <div className="truncate font-semibold text-slate-900">{a.name}</div>
+                                <div className="text-xs text-slate-600">+{formatMMK(a.priceAdd)}</div>
+                                <div className="mt-2 flex gap-2">
+                                    <button onClick={() => { setEditId(a.id); setDraftAccessory(a); setAccessoryModal(true) }} className="text-sky-600">
+                                        <Edit2 className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button onClick={() => deleteAccessory(a.id)} className="text-rose-600">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             {/* Knot Modal */}
             <Modal open={knotModal} onClose={() => setKnotModal(false)} title={editId ? 'Edit Knot' : 'Add New Knot'}>
                 <div className="grid gap-4 py-4">
@@ -373,6 +497,80 @@ export default function AdminCustomize() {
                         </label>
                     </div>
                     <Button onClick={saveColor} className="mt-2">Save Color Option</Button>
+                </div>
+            </Modal>
+
+            {/* Rope Modal */}
+            <Modal open={ropeModal} onClose={() => setRopeModal(false)} title={editId ? 'Edit Rope Type' : 'Add Rope Type'}>
+                <div className="grid gap-4 py-4">
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rope Name</span>
+                        <input
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftRope.name}
+                            onChange={(e) => setDraftRope((d) => ({ ...d, name: e.target.value }))}
+                            placeholder="e.g. 2mm Thin Rope"
+                        />
+                    </label>
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Add Price (MMK)</span>
+                        <input
+                            type="number"
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftRope.priceAdd}
+                            onChange={(e) => setDraftRope((d) => ({ ...d, priceAdd: Number(e.target.value) }))}
+                        />
+                    </label>
+                    <Button onClick={saveRope} className="mt-2">Save Rope Type</Button>
+                </div>
+            </Modal>
+
+            {/* Accessory Modal */}
+            <Modal open={accessoryModal} onClose={() => setAccessoryModal(false)} title={editId ? 'Edit Accessory' : 'Add Accessory'}>
+                <div className="grid gap-4 py-4">
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Name</span>
+                        <input
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftAccessory.name}
+                            onChange={(e) => setDraftAccessory((d) => ({ ...d, name: e.target.value }))}
+                        />
+                    </label>
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Add Price (MMK)</span>
+                        <input
+                            type="number"
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftAccessory.priceAdd}
+                            onChange={(e) => setDraftAccessory((d) => ({ ...d, priceAdd: Number(e.target.value) }))}
+                        />
+                    </label>
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Image Icon</span>
+                        <input
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftAccessory.image}
+                            onChange={(e) => setDraftAccessory((d) => ({ ...d, image: e.target.value }))}
+                        />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="mt-1 text-xs"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+                                const t = toast.loading('Reading...')
+                                try {
+                                    const { uploadPublicImage } = await import('../../lib/storage')
+                                    const b64 = await uploadPublicImage({ file })
+                                    setDraftAccessory((d) => ({ ...d, image: b64 }))
+                                    toast.success('Ready', { id: t })
+                                } catch { toast.error('Failed', { id: t }) }
+                                finally { e.target.value = '' }
+                            }}
+                        />
+                    </label>
+                    <Button onClick={saveAccessory} className="mt-2">Save Accessory</Button>
                 </div>
             </Modal>
         </div>

@@ -17,8 +17,10 @@ import { useCart } from '../context/CartContext'
 const steps = [
   { key: 'knot1', label: 'Knot Style' },
   { key: 'color1', label: 'Primary Color' },
+  { key: 'rope', label: 'Rope Type' },
   { key: 'knot2', label: 'Secondary Knot' },
   { key: 'color2', label: 'Secondary Color' },
+  { key: 'accessory', label: 'Accessories' },
   { key: 'review', label: 'Review' },
 ]
 
@@ -28,49 +30,55 @@ export default function Customize() {
   const { addItem } = useCart()
   const [active, setActive] = useState(0)
 
-  const { knots: knotStyles, colors: colorOptions, loading } = useCustomizationOptions()
+  const { knots: knotStyles, colors: colorOptions, ropes: ropeOptions, accessories: accessoryOptions, loading } = useCustomizationOptions()
   const { data: settings } = useSettings(['base_customization_price'])
 
   const [knot1, setKnot1] = useState(null)
   const [color1, setColor1] = useState(null)
+  const [rope, setRope] = useState(null)
   const [knot2, setKnot2] = useState(null)
   const [color2, setColor2] = useState(null)
+  const [accessory, setAccessory] = useState(null)
 
   // Initialize colors when data loads if not set
   useEffect(() => {
-    if (!loading && colorOptions.length > 0) {
-      if (!color1) {
-        setColor1(colorOptions[0])
+    if (!loading) {
+      if (colorOptions.length > 0) {
+        if (!color1) setColor1(colorOptions[0])
+        if (!color2) setColor2(colorOptions.length > 1 ? colorOptions[1] : colorOptions[0])
       }
-      if (!color2) {
-        setColor2(colorOptions.length > 1 ? colorOptions[1] : colorOptions[0])
+      if (ropeOptions.length > 0 && !rope) {
+        setRope(ropeOptions[0])
       }
     }
-  }, [loading, colorOptions, color1, color2])
+  }, [loading, colorOptions, color1, color2, ropeOptions, rope])
 
   const baseCustomizationPrice = Number(settings?.base_customization_price || 120000)
 
   const chosen = useMemo(() => {
-    return { knot1, color1, knot2, color2 }
-  }, [knot1, color1, knot2, color2])
+    return { knot1, color1, rope, knot2, color2, accessory }
+  }, [knot1, color1, rope, knot2, color2, accessory])
 
   const estimate = useMemo(() => {
     return calcCustomizationTotal({
       base: baseCustomizationPrice,
       knot1,
       color1,
+      rope,
       knot2,
       color2,
+      accessory,
     })
-  }, [baseCustomizationPrice, knot1, color1, knot2, color2])
+  }, [baseCustomizationPrice, knot1, color1, rope, knot2, color2, accessory])
 
   const canNext = useMemo(() => {
     if (active === 0) return !!knot1
     if (active === 1) return !!color1
-    if (active === 2) return true
-    if (active === 3) return !!color2
+    if (active === 2) return !!rope
+    if (active === 3) return true
+    if (active === 4) return !!color2
     return true
-  }, [active, knot1, color1, color2])
+  }, [active, knot1, color1, rope, color2])
 
   const summaryLabel = useMemo(() => {
     const a = knot1?.name ?? '—'
@@ -79,8 +87,8 @@ export default function Customize() {
   }, [knot1, knot2])
 
   const meta = useMemo(() => {
-    return `Knot: ${summaryLabel} • Colors: ${color1?.name ?? '—'} + ${color2?.name ?? '—'}`
-  }, [summaryLabel, color1, color2])
+    return `Knot: ${summaryLabel} • Rope: ${rope?.name ?? '—'} • Colors: ${color1?.name ?? '—'} + ${color2?.name ?? '—'} • Acc: ${accessory?.name ?? 'None'}`
+  }, [summaryLabel, rope, color1, color2, accessory])
 
   if (loading) return <LoadingSpinner label="Loading designer" />
 
@@ -125,7 +133,7 @@ export default function Customize() {
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 01</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Choose your knot style</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Select a signature knot. Hover for a subtle lift and glow; your selection is highlighted.
+                      Select a signature knot style to anchor your unique bracelet design.
                     </p>
 
                     <div className="mt-6">
@@ -181,6 +189,30 @@ export default function Customize() {
                 {active === 2 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 03</div>
+                    <h2 className="mt-2 text-3xl text-slate-900">Bracelet rope type</h2>
+                    <p className="mt-2 text-sm text-slate-700">Choose the rope thickness that suits your style—from bold thick cords to delicate thin ones.</p>
+                    <div className="mt-6 grid gap-4">
+                      {ropeOptions.map((r) => (
+                        <button
+                          key={r.id}
+                          onClick={() => setRope(r)}
+                          className={`flex items-center justify-between rounded-2xl border p-5 transition ${rope?.id === r.id ? 'border-sky-500 bg-sky-500/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                        >
+                          <div className="text-left">
+                            <div className="font-semibold text-slate-900">{r.name}</div>
+                            <div className="text-xs text-slate-600">Premium quality cord</div>
+                          </div>
+                          <div className="text-sm font-semibold text-sky-600">{formatAddonMMK(r.priceAdd)}</div>
+                        </button>
+                      ))}
+                      {ropeOptions.length === 0 && <div className="p-10 text-center text-slate-500">No rope options available.</div>}
+                    </div>
+                  </div>
+                )}
+
+                {active === 3 && (
+                  <div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 04</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Optional secondary knot</h2>
                     <p className="mt-2 text-sm text-slate-700">
                       Add a second knot detail for an elevated layered look — or keep it minimal.
@@ -222,12 +254,12 @@ export default function Customize() {
                   </div>
                 )}
 
-                {active === 3 && (
+                {active === 4 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 04</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Select secondary color</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Choose the accent tone — used for secondary cord detail, binding, or charm wrap.
+                      Choose the accent tone — used for secondary cord detail and binding.
                     </p>
 
                     <div className="mt-6">
@@ -252,33 +284,61 @@ export default function Customize() {
                   </div>
                 )}
 
-                {active === 4 && (
+                {active === 5 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 06</div>
+                    <h2 className="mt-2 text-3xl text-slate-900">Add accessories / coins</h2>
+                    <p className="mt-2 text-sm text-slate-700">Select a unique charm or coin to add a personal touch to your design.</p>
+                    <div className="mt-6 grid gap-4 grid-cols-2">
+                      <button
+                        onClick={() => setAccessory(null)}
+                        className={`rounded-2xl border p-4 text-center transition ${!accessory ? 'border-sky-500 bg-sky-500/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                      >
+                        <div className="mx-auto h-12 w-12 rounded-full bg-slate-200/50 grid place-items-center text-xs text-slate-500">None</div>
+                        <div className="mt-3 text-sm font-semibold text-slate-900">No Accessory</div>
+                      </button>
+                      {accessoryOptions.map((a) => (
+                        <button
+                          key={a.id}
+                          onClick={() => setAccessory(a)}
+                          className={`group relative rounded-2xl border p-4 text-center transition ${accessory?.id === a.id ? 'border-sky-500 bg-sky-500/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                        >
+                          <img src={a.image} className="mx-auto h-12 w-12 rounded-lg object-cover bg-white" alt={a.name} />
+                          <div className="mt-3 text-sm font-semibold text-slate-900">{a.name}</div>
+                          <div className="mt-1 text-[10px] text-sky-600 font-semibold">{formatAddonMMK(a.priceAdd)}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {active === 6 && (
+                  <div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 07</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Review your design</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Confirm your selections, review the estimate, and add the customized item to your cart.
+                      Confirm your selections and add your custom creation to the cart.
                     </p>
 
                     <div className="mt-6 grid gap-4">
                       <div className="rounded-3xl border border-white/20 bg-white/20 p-5">
-                        <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">SELECTIONS</div>
+                        <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">Summary</div>
                         <dl className="mt-4 grid gap-3 text-sm">
                           <div className="flex items-center justify-between gap-4">
-                            <dt className="text-slate-600">Primary knot</dt>
-                            <dd className="font-semibold text-slate-900">{knot1?.name ?? '—'}</dd>
+                            <dt className="text-slate-600">Style</dt>
+                            <dd className="font-semibold text-slate-900 text-right">{knot1?.name} {knot2 ? `+ ${knot2.name}` : ''}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
-                            <dt className="text-slate-600">Primary color</dt>
-                            <dd className="font-semibold text-slate-900">{color1?.name}</dd>
+                            <dt className="text-slate-600">Rope</dt>
+                            <dd className="font-semibold text-slate-900">{rope?.name}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
-                            <dt className="text-slate-600">Secondary knot</dt>
-                            <dd className="font-semibold text-slate-900">{knot2?.name ?? 'None'}</dd>
+                            <dt className="text-slate-600">Colors</dt>
+                            <dd className="font-semibold text-slate-900 text-right">{color1?.name} / {color2?.name}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
-                            <dt className="text-slate-600">Secondary color</dt>
-                            <dd className="font-semibold text-slate-900">{color2?.name}</dd>
+                            <dt className="text-slate-600">Accessory</dt>
+                            <dd className="font-semibold text-slate-900">{accessory?.name ?? 'None'}</dd>
                           </div>
                         </dl>
                       </div>
@@ -286,7 +346,7 @@ export default function Customize() {
                       <div className="rounded-3xl border border-white/20 bg-white/20 p-5">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">ESTIMATE</div>
+                            <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">TOTAL ESTIMATE</div>
                             <div className="mt-2 text-2xl font-semibold text-slate-900">{formatMMK(estimate)}</div>
                           </div>
                           <div className="rounded-2xl bg-white/50 px-4 py-2 text-xs font-semibold text-slate-800">
@@ -304,6 +364,7 @@ export default function Customize() {
                               price: estimate,
                               meta,
                             })
+                            toast.success('Custom design added to cart!')
                           }}
                         >
                           <span className="inline-flex items-center justify-center gap-2">
@@ -349,12 +410,23 @@ export default function Customize() {
           <div className="space-y-6">
             <BraceletPreview primary={color1} secondary={color2} knotLabel={summaryLabel} />
             <div className="lux-glass rounded-[32px] p-6">
-              <div className="text-sm font-semibold text-slate-900">Why it feels premium</div>
-              <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                <li>• Horizontal step indicator with animated underline</li>
-                <li>• Smooth slide transitions between steps</li>
-                <li>• Glass-style cards, soft shadows, and refined type</li>
-              </ul>
+              <div className="text-sm font-semibold text-slate-900">Your Selections</div>
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: color1?.hex }} />
+                  <span className="text-xs text-slate-700">Primary: {color1?.name}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: color2?.hex }} />
+                  <span className="text-xs text-slate-700">Secondary: {color2?.name}</span>
+                </div>
+                {accessory && (
+                  <div className="flex items-center gap-3">
+                    <img src={accessory.image} className="h-6 w-6 rounded object-cover" />
+                    <span className="text-xs text-slate-700">Accessory: {accessory.name}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
