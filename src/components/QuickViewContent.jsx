@@ -44,14 +44,13 @@ export default function QuickViewContent({ product, onAdd }) {
     const base = [{ id: 'details', label: 'Details' }]
     if (!product?.hide_care_delivery) {
       base.push({ id: 'care', label: 'Care' })
-      base.push({ id: 'delivery', label: 'Delivery' })
     }
     return base
   }, [product?.hide_care_delivery])
 
   // Ensure current tab is valid
   useEffect(() => {
-    if (product?.hide_care_delivery && (tab === 'care' || tab === 'delivery')) {
+    if (product?.hide_care_delivery && tab === 'care') {
       setTab('details')
     }
   }, [product?.hide_care_delivery, tab])
@@ -84,7 +83,9 @@ export default function QuickViewContent({ product, onAdd }) {
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">INSTRUCTIONS</div>
-              <div className="mt-1 text-sm font-semibold text-slate-900">How to enjoy this piece</div>
+              <div className="mt-1 text-sm font-semibold text-slate-900">
+                {tab === 'care' ? 'Traditional Chinese Handmade Silk Rope Bracelet Care' : 'How to enjoy this piece'}
+              </div>
             </div>
             <div className="text-lg font-semibold text-slate-900">{formatMMK(product.price)}</div>
           </div>

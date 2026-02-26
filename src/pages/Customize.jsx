@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import Container from '../components/Container'
 import PageTransition from '../components/PageTransition'
@@ -15,10 +16,9 @@ import { calcCustomizationTotal, formatAddonMMK } from '../lib/customPricing'
 import { useCart } from '../context/CartContext'
 
 const steps = [
-  { key: 'knot1', label: 'Knot Style' },
+  { key: 'knots', label: 'Knot Styles' },
   { key: 'color1', label: 'Primary Color' },
   { key: 'rope', label: 'Rope Type' },
-  { key: 'knot2', label: 'Secondary Knot' },
   { key: 'color2', label: 'Secondary Color' },
   { key: 'accessory', label: 'Accessories' },
   { key: 'review', label: 'Review' },
@@ -33,10 +33,9 @@ export default function Customize() {
   const { knots: knotStyles, colors: colorOptions, ropes: ropeOptions, accessories: accessoryOptions, loading } = useCustomizationOptions()
   const { data: settings } = useSettings(['base_customization_price'])
 
-  const [knot1, setKnot1] = useState(null)
+  const [selectedKnots, setSelectedKnots] = useState([]) // Array of 2-4 knots
   const [color1, setColor1] = useState(null)
   const [rope, setRope] = useState(null)
-  const [knot2, setKnot2] = useState(null)
   const [color2, setColor2] = useState(null)
   const [accessory, setAccessory] = useState(null)
 
@@ -56,38 +55,34 @@ export default function Customize() {
   const baseCustomizationPrice = Number(settings?.base_customization_price || 120000)
 
   const chosen = useMemo(() => {
-    return { knot1, color1, rope, knot2, color2, accessory }
-  }, [knot1, color1, rope, knot2, color2, accessory])
+    return { selectedKnots, color1, rope, color2, accessory }
+  }, [selectedKnots, color1, rope, color2, accessory])
 
   const estimate = useMemo(() => {
     return calcCustomizationTotal({
       base: baseCustomizationPrice,
-      knot1,
+      knots: selectedKnots,
       color1,
       rope,
-      knot2,
       color2,
       accessory,
     })
-  }, [baseCustomizationPrice, knot1, color1, rope, knot2, color2, accessory])
+  }, [baseCustomizationPrice, selectedKnots, color1, rope, color2, accessory])
 
   const canNext = useMemo(() => {
-    if (active === 0) return !!knot1
+    if (active === 0) return selectedKnots.length >= 2 && selectedKnots.length <= 4
     if (active === 1) return !!color1
     if (active === 2) return !!rope
-    if (active === 3) return true
-    if (active === 4) return !!color2
+    if (active === 3) return !!color2
     return true
-  }, [active, knot1, color1, rope, color2])
+  }, [active, selectedKnots, color1, rope, color2])
 
   const summaryLabel = useMemo(() => {
-    const a = knot1?.name ?? '—'
-    const b = knot2?.name ? ` + ${knot2.name}` : ''
-    return `${a}${b}`
-  }, [knot1, knot2])
+    return selectedKnots.map(k => k.name).join(' + ') || '—'
+  }, [selectedKnots])
 
   const meta = useMemo(() => {
-    return `Knot: ${summaryLabel} • Rope: ${rope?.name ?? '—'} • Colors: ${color1?.name ?? '—'} + ${color2?.name ?? '—'} • Acc: ${accessory?.name ?? 'None'}`
+    return `Knots: ${summaryLabel} • Rope: ${rope?.name ?? '—'} • Colors: ${color1?.name ?? '—'} + ${color2?.name ?? '—'} • Acc: ${accessory?.name ?? 'None'}`
   }, [summaryLabel, rope, color1, color2, accessory])
 
   if (loading) return <LoadingSpinner label="Loading designer" />
@@ -131,23 +126,34 @@ export default function Customize() {
                 {active === 0 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 01</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Choose your knot style</h2>
+                    <h2 className="mt-2 text-3xl text-slate-900">Choose 2 to 4 knots</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Select a signature knot style to anchor your unique bracelet design.
+                      Select at least two signature knots (up to four) to create your unique pattern.
                     </p>
 
                     <div className="mt-6">
                       {knotStyles.length > 0 ? (
                         <div className="grid gap-5 sm:grid-cols-2">
-                          {knotStyles.map((k) => (
-                            <KnotCard
-                              key={k.id}
-                              knot={k}
-                              selected={knot1?.id === k.id}
-                              onSelect={setKnot1}
-                              rightNote={formatAddonMMK(k.priceAdd)}
-                            />
-                          ))}
+                          {knotStyles.map((k) => {
+                            const isSelected = selectedKnots.some(pk => pk.id === k.id)
+                            return (
+                              <KnotCard
+                                key={k.id}
+                                knot={k}
+                                selected={isSelected}
+                                onSelect={() => {
+                                  if (isSelected) {
+                                    setSelectedKnots(prev => prev.filter(p => p.id !== k.id))
+                                  } else if (selectedKnots.length < 4) {
+                                    setSelectedKnots(prev => [...prev, k])
+                                  } else {
+                                    toast.error('Maximum 4 knots allowed')
+                                  }
+                                }}
+                                rightNote={formatAddonMMK(k.priceAdd)}
+                              />
+                            )
+                          })}
                         </div>
                       ) : (
                         <div className="rounded-3xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
@@ -213,50 +219,6 @@ export default function Customize() {
                 {active === 3 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 04</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Optional secondary knot</h2>
-                    <p className="mt-2 text-sm text-slate-700">
-                      Add a second knot detail for an elevated layered look — or keep it minimal.
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        className={`lux-ring rounded-full border px-4 py-2 text-sm font-semibold transition ${!knot2
-                          ? 'border-sky-300/70 bg-white/60 text-slate-900'
-                          : 'border-white/25 bg-white/25 text-slate-700 hover:bg-white/40'
-                          }`}
-                        onClick={() => setKnot2(null)}
-                      >
-                        No secondary knot
-                      </button>
-                      <div className="text-sm text-slate-600 self-center">or pick one:</div>
-                    </div>
-
-                    <div className="mt-6">
-                      {knotStyles.length > 0 ? (
-                        <div className="grid gap-5 sm:grid-cols-2">
-                          {knotStyles.map((k) => (
-                            <KnotCard
-                              key={k.id}
-                              knot={k}
-                              selected={knot2?.id === k.id}
-                              onSelect={setKnot2}
-                              rightNote={formatAddonMMK(k.priceAdd)}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                          No secondary knots available.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {active === 4 && (
-                  <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Select secondary color</h2>
                     <p className="mt-2 text-sm text-slate-700">
                       Choose the accent tone — used for secondary cord detail and binding.
@@ -284,9 +246,9 @@ export default function Customize() {
                   </div>
                 )}
 
-                {active === 5 && (
+                {active === 4 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 06</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Add accessories / coins</h2>
                     <p className="mt-2 text-sm text-slate-700">Select a unique charm or coin to add a personal touch to your design.</p>
                     <div className="mt-6 grid gap-4 grid-cols-2">
@@ -312,9 +274,9 @@ export default function Customize() {
                   </div>
                 )}
 
-                {active === 6 && (
+                {active === 5 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 07</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 06</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Review your design</h2>
                     <p className="mt-2 text-sm text-slate-700">
                       Confirm your selections and add your custom creation to the cart.
@@ -325,8 +287,8 @@ export default function Customize() {
                         <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">Summary</div>
                         <dl className="mt-4 grid gap-3 text-sm">
                           <div className="flex items-center justify-between gap-4">
-                            <dt className="text-slate-600">Style</dt>
-                            <dd className="font-semibold text-slate-900 text-right">{knot1?.name} {knot2 ? `+ ${knot2.name}` : ''}</dd>
+                            <dt className="text-slate-600">Knots</dt>
+                            <dd className="font-semibold text-slate-900 text-right">{selectedKnots.map(k => k.name).join(', ')}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
                             <dt className="text-slate-600">Rope</dt>
@@ -360,7 +322,7 @@ export default function Customize() {
                           onClick={() => {
                             addItem({
                               id: `custom-${Date.now()}`,
-                              name: `Custom Bracelet (${knot1?.name ?? 'Knot'})`,
+                              name: `Custom Bracelet (${selectedKnots[0]?.name ?? 'Knot'})`,
                               price: estimate,
                               meta,
                             })
