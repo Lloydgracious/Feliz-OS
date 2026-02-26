@@ -4,7 +4,7 @@ import { cn } from '../lib/utils'
 export default function StepIndicator({ steps, activeIndex, onStep }) {
   return (
     <div className="lux-glass rounded-3xl px-4 py-3">
-      <div className="relative grid grid-cols-5 gap-2">
+      <div className="relative flex flex-wrap gap-2 md:grid md:grid-flow-col">
         {steps.map((s, idx) => {
           const active = idx === activeIndex
           const done = idx < activeIndex

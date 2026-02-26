@@ -37,7 +37,7 @@ export default function Customize() {
   const [rope, setRope] = useState(null)
   const [accessory, setAccessory] = useState(null)
 
-  // Initialize defaults
+  // Initialize colors when data loads if not set
   useEffect(() => {
     if (!loading) {
       if (colorOptions.length > 0 && selectedColors.length === 0) {
@@ -167,7 +167,7 @@ export default function Customize() {
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 02</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Choose 1 or 2 colors</h2>
-                    <p className="mt-2 text-sm text-slate-700">Select your favorite cord tones. You can pick up to two for a layered look.</p>
+                    <p className="mt-2 text-sm text-slate-700">Select up to two cord tones to create a beautiful layered or multi-tone look.</p>
 
                     <div className="mt-6">
                       {colorOptions.length > 0 ? (
@@ -257,10 +257,10 @@ export default function Customize() {
 
                 {active === 4 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 05</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Review your design</h2>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">STEP 05: Review</div>
+                    <h2 className="mt-2 text-3xl text-slate-900">Confirm your design</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Confirm your selections and add your custom creation to the cart.
+                      Double check your selections and add your custom creation to the cart.
                     </p>
 
                     <div className="mt-6 grid gap-4">
@@ -272,12 +272,12 @@ export default function Customize() {
                             <dd className="font-semibold text-slate-900 text-right">{selectedKnots.map(k => k.name).join(', ')}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
-                            <dt className="text-slate-600">Rope</dt>
-                            <dd className="font-semibold text-slate-900">{rope?.name}</dd>
-                          </div>
-                          <div className="flex items-center justify-between gap-4">
                             <dt className="text-slate-600">Colors</dt>
                             <dd className="font-semibold text-slate-900 text-right">{selectedColors.map(c => c.name).join(' / ')}</dd>
+                          </div>
+                          <div className="flex items-center justify-between gap-4">
+                            <dt className="text-slate-600">Rope</dt>
+                            <dd className="font-semibold text-slate-900">{rope?.name}</dd>
                           </div>
                           <div className="flex items-center justify-between gap-4">
                             <dt className="text-slate-600">Accessory</dt>
@@ -357,10 +357,16 @@ export default function Customize() {
               <div className="mt-4 space-y-3">
                 {selectedColors.map((c, idx) => (
                   <div key={idx} className="flex items-center gap-3">
-                    <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: c?.hex }} />
+                    <div className="h-6 w-6 rounded-full border border-white/35 shadow-sm" style={{ backgroundColor: c?.hex }} />
                     <span className="text-xs text-slate-700">{idx === 0 ? 'Primary' : 'Secondary'}: {c?.name}</span>
                   </div>
                 ))}
+                {rope && (
+                  <div className="flex items-center gap-3">
+                    <div className="h-6 w-6 rounded-full bg-slate-200 grid place-items-center text-[8px] font-bold text-slate-600">R</div>
+                    <span className="text-xs text-slate-700">Rope: {rope.name}</span>
+                  </div>
+                )}
                 {accessory && (
                   <div className="flex items-center gap-3">
                     <img src={accessory.image} className="h-6 w-6 rounded object-cover" />

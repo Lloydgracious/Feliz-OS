@@ -50,7 +50,7 @@ export default function QuickViewContent({ product, onAdd }) {
 
   // Ensure current tab is valid
   useEffect(() => {
-    if (product?.hide_care_delivery && tab === 'care') {
+    if (tab === 'delivery' || (product?.hide_care_delivery && tab === 'care')) {
       setTab('details')
     }
   }, [product?.hide_care_delivery, tab])
@@ -82,7 +82,7 @@ export default function QuickViewContent({ product, onAdd }) {
         <div className="mt-6 lux-glass rounded-[28px] p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">INSTRUCTIONS</div>
+              <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">INSTRUCTIONS</div>
               <div className="mt-1 text-sm font-semibold text-slate-900">
                 {tab === 'care' ? 'Traditional Chinese Handmade Silk Rope Bracelet Care' : 'How to enjoy this piece'}
               </div>
@@ -111,14 +111,6 @@ export default function QuickViewContent({ product, onAdd }) {
               {tab === 'care' && !product.hide_care_delivery && (
                 <ul className="space-y-2">
                   {careGuide.map((b) => (
-                    <li key={b}>• {b}</li>
-                  ))}
-                </ul>
-              )}
-
-              {tab === 'delivery' && !product.hide_care_delivery && (
-                <ul className="space-y-2">
-                  {deliveryNotes.map((b) => (
                     <li key={b}>• {b}</li>
                   ))}
                 </ul>
