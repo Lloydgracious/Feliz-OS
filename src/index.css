@@ -3,19 +3,26 @@
 @import "tailwindcss";
 
 :root {
-  --lux-ice: #eaf4ff;
-  --lux-sky: #bfe3ff;
-  --lux-azure: #7cc7ff;
-  --lux-ink: #0b1220;
+  --lux-ice: #d8f7fc;
+  --lux-sky: #8de8f5;
+  --lux-azure: #18bdd4;
+  --lux-sun: #f0c800;
+  --lux-ink: #0f172a;
+
+  --color-feliz-blue: var(--lux-azure);
+  --color-feliz-yellow: var(--lux-sun);
+  --color-feliz-ink: var(--lux-ink);
+
   --lux-silver: rgba(255, 255, 255, 0.55);
   --lux-glass: rgba(255, 255, 255, 0.22);
   --lux-border: rgba(255, 255, 255, 0.30);
-  --lux-shadow: 0 20px 60px rgba(5, 20, 45, 0.18);
+  --lux-shadow: 0 20px 60px rgba(5, 40, 55, 0.14);
 
   color: var(--lux-ink);
-  background: radial-gradient(1200px 600px at 15% 10%, var(--lux-ice), transparent 60%),
-    radial-gradient(1000px 700px at 85% 0%, rgba(124, 199, 255, 0.35), transparent 55%),
-    linear-gradient(180deg, #fbfdff, #f4f9ff);
+  background:
+    radial-gradient(1100px 500px at 12% 8%, rgba(216, 247, 252, 0.85), transparent 58%),
+    radial-gradient(900px 600px at 88% 0%, rgba(24, 189, 212, 0.18), transparent 55%),
+    linear-gradient(180deg, #f6feff, #edf9fc);
 
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   text-rendering: optimizeLegibility;
@@ -23,7 +30,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -36,7 +44,10 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
 }
 
@@ -47,7 +58,7 @@ h1, h2, h3, h4 {
 /* Subtle Chinese-inspired pattern */
 .lux-pattern {
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(124, 199, 255, 0.20) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(24, 189, 212, 0.28) 1px, transparent 0);
   background-size: 20px 20px;
   mask-image: radial-gradient(400px 400px at 30% 20%, black 30%, transparent 70%);
 }
@@ -55,10 +66,10 @@ h1, h2, h3, h4 {
 /* More ornamental pattern for hero backgrounds */
 .lux-pattern-hero {
   background-image:
-    radial-gradient(circle at 2px 2px, rgba(124, 199, 255, 0.14) 1.2px, transparent 0),
-    radial-gradient(circle at 12px 12px, rgba(255, 255, 255, 0.22) 1px, transparent 0);
+    radial-gradient(circle at 2px 2px, rgba(24, 189, 212, 0.22) 1.2px, transparent 0),
+    radial-gradient(circle at 12px 12px, rgba(240, 200, 0, 0.12) 1px, transparent 0);
   background-size: 28px 28px;
-  opacity: 0.55;
+  opacity: 0.65;
   mask-image: radial-gradient(600px 420px at 25% 20%, black 35%, transparent 72%);
 }
 
@@ -67,7 +78,7 @@ h1, h2, h3, h4 {
 }
 
 .lux-hero-sheen {
-  background: linear-gradient(90deg, #0b1220 0%, #0b1220 30%, rgba(40, 110, 170, 0.95) 55%, #0b1220 80%);
+  background: linear-gradient(90deg, #0f172a 0%, #0f172a 25%, rgba(24, 189, 212, 0.9) 52%, #0f172a 78%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -89,5 +100,14 @@ h1, h2, h3, h4 {
 
 .lux-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(124, 199, 255, 0.35);
+  box-shadow: 0 0 0 4px rgba(24, 189, 212, 0.35);
+}
+
+/* Brand accent utility */
+.feliz-yellow-dot {
+  background: var(--lux-sun);
+}
+
+.feliz-blue-dot {
+  background: var(--lux-azure);
 }

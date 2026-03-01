@@ -13,9 +13,11 @@ export default function Button({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_14px_40px_rgba(2,68,120,0.22)] hover:brightness-105',
+      'bg-gradient-to-r from-feliz-blue to-cyan-700 text-white shadow-[0_14px_40px_rgba(24,189,212,0.28)] hover:brightness-110',
     secondary:
       'lux-glass text-slate-900 hover:bg-white/20',
+    yellow:
+      'bg-gradient-to-r from-feliz-yellow to-amber-400 text-slate-900 font-bold shadow-[0_14px_40px_rgba(240,200,0,0.28)] hover:brightness-110',
     ghost: 'text-slate-800 hover:bg-white/25',
   }
 

@@ -39,7 +39,7 @@ export default function ProductCard({ product, onQuickView, onAdd, className }) 
           </button>
           <button
             onClick={() => onAdd?.(product)}
-            className="lux-ring inline-flex items-center justify-center rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:brightness-105"
+            className="lux-ring inline-flex items-center justify-center rounded-2xl bg-feliz-blue px-4 py-3 text-sm font-semibold text-white hover:brightness-105"
             aria-label="Add to cart"
           >
             <Plus className="h-4 w-4" />

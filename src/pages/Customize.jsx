@@ -97,16 +97,11 @@ export default function Customize() {
   return (
     <PageTransition>
       <Container className="py-14">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <SectionHeading
-            eyebrow="Customization"
-            title="Design your piece"
-            subtitle="An interactive multi-step flow with premium motion and a live preview."
-          />
-          <div className="lux-glass rounded-3xl px-5 py-4 text-sm text-slate-700">
-            Price estimate: <span className="font-semibold text-slate-900">{formatMMK(baseCustomizationPrice)}</span> <span className="text-slate-500">+ add-ons</span> — <span className="font-semibold text-slate-900">{formatMMK(estimate)}</span>
-          </div>
-        </div>
+        <SectionHeading
+          eyebrow="Customization"
+          title="Design your piece"
+          subtitle="An interactive multi-step flow with premium motion and a live preview."
+        />
 
         <div className="mt-8">
           <StepIndicator steps={steps} activeIndex={active} onStep={setActive} />
@@ -124,7 +119,7 @@ export default function Customize() {
               >
                 {active === 0 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 01</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 01</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Choose 2 to 4 knots</h2>
                     <p className="mt-2 text-sm text-slate-700">
                       Select at least two signature knots (up to four) to create your unique pattern.
@@ -165,7 +160,7 @@ export default function Customize() {
 
                 {active === 1 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 02</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 02</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Choose 1 to 4 colors</h2>
                     <p className="mt-2 text-sm text-slate-700">Select up to four cord tones to create a beautiful multi-tone look.</p>
 
@@ -205,7 +200,7 @@ export default function Customize() {
 
                 {active === 2 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 03</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 03</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Bracelet rope type</h2>
                     <p className="mt-2 text-sm text-slate-700">Choose the rope thickness that suits your style—from bold thick cords to delicate thin ones.</p>
                     <div className="mt-6 grid gap-4">
@@ -213,13 +208,13 @@ export default function Customize() {
                         <button
                           key={r.id}
                           onClick={() => setRope(r)}
-                          className={`flex items-center justify-between rounded-2xl border p-5 transition ${rope?.id === r.id ? 'border-sky-500 bg-sky-500/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                          className={`flex items-center justify-between rounded-2xl border p-5 transition ${rope?.id === r.id ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
                         >
                           <div className="text-left">
                             <div className="font-semibold text-slate-900">{r.name}</div>
                             <div className="text-xs text-slate-600">Premium quality cord</div>
                           </div>
-                          <div className="text-sm font-semibold text-sky-600">{formatAddonMMK(r.priceAdd)}</div>
+                          <div className="text-sm font-semibold text-feliz-blue">{formatAddonMMK(r.priceAdd)}</div>
                         </button>
                       ))}
                       {ropeOptions.length === 0 && <div className="p-10 text-center text-slate-500">No rope options available.</div>}
@@ -229,13 +224,13 @@ export default function Customize() {
 
                 {active === 3 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 04</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 04</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Add accessories / coins</h2>
                     <p className="mt-2 text-sm text-slate-700">Select a unique charm or coin to add a personal touch to your design.</p>
                     <div className="mt-6 grid gap-4 grid-cols-2">
                       <button
                         onClick={() => setAccessory(null)}
-                        className={`rounded-2xl border p-4 text-center transition ${!accessory ? 'border-sky-500 bg-sky-500/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                        className={`rounded-2xl border p-4 text-center transition ${!accessory ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
                       >
                         <div className="mx-auto h-12 w-12 rounded-full bg-slate-200/50 grid place-items-center text-xs text-slate-500">None</div>
                         <div className="mt-3 text-sm font-semibold text-slate-900">No Accessory</div>
@@ -244,11 +239,11 @@ export default function Customize() {
                         <button
                           key={a.id}
                           onClick={() => setAccessory(a)}
-                          className={`group relative rounded-2xl border p-4 text-center transition ${accessory?.id === a.id ? 'border-sky-500 bg-sky-500/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                          className={`group relative rounded-2xl border p-4 text-center transition ${accessory?.id === a.id ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
                         >
                           <img src={a.image} className="mx-auto h-12 w-12 rounded-lg object-cover bg-white" alt={a.name} />
                           <div className="mt-3 text-sm font-semibold text-slate-900">{a.name}</div>
-                          <div className="mt-1 text-[10px] text-sky-600 font-semibold">{formatAddonMMK(a.priceAdd)}</div>
+                          <div className="mt-1 text-[10px] text-feliz-blue font-semibold">{formatAddonMMK(a.priceAdd)}</div>
                         </button>
                       ))}
                     </div>
@@ -257,7 +252,7 @@ export default function Customize() {
 
                 {active === 4 && (
                   <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">STEP 05: Review</div>
+                    <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue uppercase">STEP 05: Review</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Confirm your design</h2>
                     <p className="mt-2 text-sm text-slate-700">
                       Double check your selections and add your custom creation to the cart.
@@ -265,7 +260,7 @@ export default function Customize() {
 
                     <div className="mt-6 grid gap-4">
                       <div className="rounded-3xl border border-white/20 bg-white/20 p-5">
-                        <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">Summary</div>
+                        <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue uppercase">Summary</div>
                         <dl className="mt-4 grid gap-3 text-sm">
                           <div className="flex items-center justify-between gap-4">
                             <dt className="text-slate-600">Knots</dt>
@@ -289,7 +284,7 @@ export default function Customize() {
                       <div className="rounded-3xl border border-white/20 bg-white/20 p-5">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80 uppercase">TOTAL ESTIMATE</div>
+                            <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue uppercase">TOTAL ESTIMATE</div>
                             <div className="mt-2 text-2xl font-semibold text-slate-900">{formatMMK(estimate)}</div>
                           </div>
                           <div className="rounded-2xl bg-white/50 px-4 py-2 text-xs font-semibold text-slate-800">
@@ -299,7 +294,7 @@ export default function Customize() {
 
                         <button
                           type="button"
-                          className="mt-5 w-full rounded-2xl bg-sky-600 px-5 py-4 text-sm font-semibold text-white hover:brightness-105"
+                          className="mt-5 w-full rounded-2xl bg-gradient-to-r from-feliz-yellow to-amber-500 px-5 py-4 text-sm font-bold text-slate-900 shadow-lg hover:brightness-105"
                           onClick={() => {
                             addItem({
                               id: `custom-${Date.now()}`,
@@ -342,7 +337,7 @@ export default function Customize() {
                 disabled={!canNext || active === steps.length - 1}
                 className={`lux-ring inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition ${!canNext || active === steps.length - 1
                   ? 'border border-white/10 bg-white/10 text-slate-500'
-                  : 'bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:brightness-105'
+                  : 'bg-gradient-to-r from-feliz-blue to-cyan-600 text-white hover:brightness-105'
                   }`}
               >
                 Next <ArrowRight className="h-4 w-4" />

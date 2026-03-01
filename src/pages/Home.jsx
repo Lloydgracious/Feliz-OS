@@ -61,7 +61,7 @@ export default function Home() {
     <PageTransition>
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_18%_20%,rgba(124,199,255,0.45),transparent_60%),radial-gradient(700px_500px_at_82%_0%,rgba(255,255,255,0.75),transparent_62%),linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0.15))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_18%_20%,rgba(24,189,212,0.28),transparent_58%),radial-gradient(700px_500px_at_82%_0%,rgba(255,255,255,0.75),transparent_62%),linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.12))]" />
           <div className="absolute inset-0 lux-pattern-hero" />
           <div
             className="absolute inset-0 opacity-30"
@@ -79,7 +79,7 @@ export default function Home() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/55 px-4 py-2 text-xs font-semibold tracking-wide text-slate-800 backdrop-blur">
               {settings?.home_hero_badge || 'Premium handmade Chinese knots'}
-              <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-feliz-blue" />
               Modern luxury palette
             </div>
 
@@ -104,7 +104,7 @@ export default function Home() {
 
           <div className="relative">
             <motion.div
-              className="absolute -right-10 -top-10 h-64 w-64 rounded-[36px] bg-gradient-to-br from-sky-400/25 to-blue-700/15 blur-2xl"
+              className="absolute -right-10 -top-10 h-64 w-64 rounded-[36px] bg-gradient-to-br from-feliz-blue/35 to-feliz-yellow/20 blur-2xl"
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             />
@@ -207,7 +207,7 @@ export default function Home() {
 
             <div className="relative grid gap-8 p-8 sm:p-10 lg:grid-cols-2 lg:items-center">
               <div>
-                <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">COLLECTION</div>
+                <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">COLLECTION</div>
                 <div className="mt-2 text-3xl text-slate-900 sm:text-4xl">A small drop. A calm luxury feel.</div>
                 <p className="mt-3 max-w-xl text-sm text-slate-700">
                   Discover keychains and knot pieces designed for gifting, collecting, and daily wear — with the Feliz signature palette.
@@ -300,7 +300,7 @@ export default function Home() {
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="rounded-3xl border border-white/20 bg-white/20 p-6">
-                <div className="text-xs font-semibold tracking-[0.2em] text-sky-700/80">STEP 0{i}</div>
+                <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 0{i}</div>
                 <div className="mt-2 text-xl text-slate-900">
                   {i === 1 ? 'Pick your knot' : i === 2 ? 'Select colorways' : 'Review & add to cart'}
                 </div>
@@ -316,7 +316,7 @@ export default function Home() {
           </div>
 
           <div className="mt-8">
-            <Button as={Link} to="/customize">
+            <Button as={Link} to="/customize" variant="yellow">
               Start Customizing <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
