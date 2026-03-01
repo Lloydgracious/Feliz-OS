@@ -203,52 +203,89 @@ export default function Customize() {
                     <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 03</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Bracelet rope type</h2>
                     <p className="mt-2 text-sm text-slate-700">Choose the rope thickness that suits your style—from bold thick cords to delicate thin ones.</p>
-                    <div className="mt-6 grid gap-4">
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
                       {ropeOptions.map((r) => (
                         <button
                           key={r.id}
-                          onClick={() => setRope(r)}
-                          className={`flex items-center justify-between rounded-2xl border p-5 transition ${rope?.id === r.id ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                          onClick={() => {
+                            setRope(r)
+                            // clear accessory if it doesn't match new rope
+                            if (accessory && accessory.ropeType && accessory.ropeType !== 'all' && accessory.ropeType !== r.id) {
+                              setAccessory(null)
+                            }
+                          }}
+                          className={`group relative overflow-hidden rounded-2xl border transition text-left ${rope?.id === r.id ? 'border-feliz-blue ring-2 ring-feliz-blue/30' : 'border-white/20 hover:border-feliz-blue/40'}`}
                         >
-                          <div className="text-left">
+                          {r.image ? (
+                            <div className="relative h-36 w-full overflow-hidden">
+                              <img
+                                src={r.image}
+                                alt={r.name}
+                                className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent" />
+                              {rope?.id === r.id && (
+                                <div className="absolute right-3 top-3 rounded-full bg-feliz-blue p-1">
+                                  <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8 15.414l-4.707-4.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className={`h-36 w-full flex items-center justify-center ${rope?.id === r.id ? 'bg-feliz-blue/10' : 'bg-white/20'}`}>
+                              <div className="text-slate-400 text-sm">No image</div>
+                            </div>
+                          )}
+                          <div className={`p-4 ${rope?.id === r.id ? 'bg-feliz-blue/8' : 'bg-white/20'}`}>
                             <div className="font-semibold text-slate-900">{r.name}</div>
-                            <div className="text-xs text-slate-600">Premium quality cord</div>
+                            <div className="mt-0.5 text-sm font-semibold text-feliz-blue">{formatAddonMMK(r.priceAdd)}</div>
                           </div>
-                          <div className="text-sm font-semibold text-feliz-blue">{formatAddonMMK(r.priceAdd)}</div>
                         </button>
                       ))}
-                      {ropeOptions.length === 0 && <div className="p-10 text-center text-slate-500">No rope options available.</div>}
+                      {ropeOptions.length === 0 && <div className="col-span-2 p-10 text-center text-slate-500">No rope options available.</div>}
                     </div>
                   </div>
                 )}
 
-                {active === 3 && (
-                  <div>
-                    <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 04</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Add accessories / coins</h2>
-                    <p className="mt-2 text-sm text-slate-700">Select a unique charm or coin to add a personal touch to your design.</p>
-                    <div className="mt-6 grid gap-4 grid-cols-2">
-                      <button
-                        onClick={() => setAccessory(null)}
-                        className={`rounded-2xl border p-4 text-center transition ${!accessory ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
-                      >
-                        <div className="mx-auto h-12 w-12 rounded-full bg-slate-200/50 grid place-items-center text-xs text-slate-500">None</div>
-                        <div className="mt-3 text-sm font-semibold text-slate-900">No Accessory</div>
-                      </button>
-                      {accessoryOptions.map((a) => (
+                {active === 3 && (() => {
+                  const filteredAccessories = accessoryOptions.filter(
+                    (a) => !a.ropeType || a.ropeType === 'all' || a.ropeType === rope?.id
+                  )
+                  return (
+                    <div>
+                      <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 04</div>
+                      <h2 className="mt-2 text-3xl text-slate-900">Add accessories / coins</h2>
+                      <p className="mt-2 text-sm text-slate-700">
+                        Select a unique charm or coin to add a personal touch to your design.
+                        {rope && <span className="ml-1 font-medium text-feliz-blue">Showing items for {rope.name}.</span>}
+                      </p>
+                      <div className="mt-6 grid gap-4 grid-cols-2">
                         <button
-                          key={a.id}
-                          onClick={() => setAccessory(a)}
-                          className={`group relative rounded-2xl border p-4 text-center transition ${accessory?.id === a.id ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                          onClick={() => setAccessory(null)}
+                          className={`rounded-2xl border p-4 text-center transition ${!accessory ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
                         >
-                          <img src={a.image} className="mx-auto h-12 w-12 rounded-lg object-cover bg-white" alt={a.name} />
-                          <div className="mt-3 text-sm font-semibold text-slate-900">{a.name}</div>
-                          <div className="mt-1 text-[10px] text-feliz-blue font-semibold">{formatAddonMMK(a.priceAdd)}</div>
+                          <div className="mx-auto h-12 w-12 rounded-full bg-slate-200/50 grid place-items-center text-xs text-slate-500">None</div>
+                          <div className="mt-3 text-sm font-semibold text-slate-900">No Accessory</div>
                         </button>
-                      ))}
+                        {filteredAccessories.map((a) => (
+                          <button
+                            key={a.id}
+                            onClick={() => setAccessory(a)}
+                            className={`group relative rounded-2xl border p-4 text-center transition ${accessory?.id === a.id ? 'border-feliz-blue bg-feliz-blue/10' : 'border-white/20 bg-white/20 hover:bg-white/30'}`}
+                          >
+                            <img src={a.image} className="mx-auto h-12 w-12 rounded-lg object-cover bg-white" alt={a.name} />
+                            <div className="mt-3 text-sm font-semibold text-slate-900">{a.name}</div>
+                            <div className="mt-1 text-[10px] text-feliz-blue font-semibold">{formatAddonMMK(a.priceAdd)}</div>
+                          </button>
+                        ))}
+                        {filteredAccessories.length === 0 && (
+                          <div className="col-span-2 rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500">
+                            No accessories available for this rope type.
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )
+                })()}
 
                 {active === 4 && (
                   <div>

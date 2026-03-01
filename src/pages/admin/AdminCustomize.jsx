@@ -10,8 +10,8 @@ import { useSettings } from '../../lib/useSettings'
 
 const EMPTY_KNOT = { name: '', meaning: '', description: '', image: '', priceAdd: 0 }
 const EMPTY_COLOR = { name: '', hex: '#000000', priceAdd: 0 }
-const EMPTY_ROPE = { name: '', priceAdd: 0 }
-const EMPTY_ACCESSORY = { name: '', image: '', priceAdd: 0 }
+const EMPTY_ROPE = { name: '', image: '', priceAdd: 0 }
+const EMPTY_ACCESSORY = { name: '', image: '', priceAdd: 0, ropeType: 'all' }
 
 export default function AdminCustomize() {
     const [knots, setKnots] = useState([])
@@ -337,20 +337,21 @@ export default function AdminCustomize() {
                         <Plus className="h-4 w-4" /> Add Rope
                     </Button>
                 </div>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {ropes.map((r) => (
-                        <div key={r.id} className="lux-ring flex items-center justify-between rounded-2xl bg-white/40 p-4">
-                            <div>
+                        <div key={r.id} className="lux-ring flex gap-4 rounded-2xl bg-white/40 p-4">
+                            {r.image && <img src={r.image} className="h-16 w-16 rounded-xl object-cover" alt={r.name} />}
+                            <div className="flex-1 min-w-0">
                                 <div className="font-semibold text-slate-900">{r.name}</div>
                                 <div className="text-xs text-slate-600">+{formatMMK(r.priceAdd)}</div>
-                            </div>
-                            <div className="flex gap-2">
-                                <button onClick={() => { setEditId(r.id); setDraftRope(r); setRopeModal(true) }} className="text-sky-600">
-                                    <Edit2 className="h-3.5 w-3.5" />
-                                </button>
-                                <button onClick={() => deleteRope(r.id)} className="text-rose-600">
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </button>
+                                <div className="mt-2 flex gap-2">
+                                    <button onClick={() => { setEditId(r.id); setDraftRope(r); setRopeModal(true) }} className="text-sky-600">
+                                        <Edit2 className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button onClick={() => deleteRope(r.id)} className="text-rose-600">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -371,10 +372,13 @@ export default function AdminCustomize() {
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {accessories.map((a) => (
                         <div key={a.id} className="lux-ring flex gap-4 rounded-2xl bg-white/40 p-4">
-                            <img src={a.image} className="h-12 w-12 rounded-lg object-cover bg-white" />
+                            <img src={a.image} className="h-12 w-12 rounded-lg object-cover bg-white" alt={a.name} />
                             <div className="flex-1 min-w-0">
                                 <div className="truncate font-semibold text-slate-900">{a.name}</div>
                                 <div className="text-xs text-slate-600">+{formatMMK(a.priceAdd)}</div>
+                                {a.ropeType && a.ropeType !== 'all' && (
+                                    <div className="mt-1 inline-block rounded-full bg-feliz-blue/10 px-2 py-0.5 text-[10px] font-semibold text-feliz-blue capitalize">{a.ropeType} only</div>
+                                )}
                                 <div className="mt-2 flex gap-2">
                                     <button onClick={() => { setEditId(a.id); setDraftAccessory(a); setAccessoryModal(true) }} className="text-sky-600">
                                         <Edit2 className="h-3.5 w-3.5" />
@@ -521,6 +525,35 @@ export default function AdminCustomize() {
                             onChange={(e) => setDraftRope((d) => ({ ...d, priceAdd: Number(e.target.value) }))}
                         />
                     </label>
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rope Photo</span>
+                        <input
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftRope.image || ''}
+                            onChange={(e) => setDraftRope((d) => ({ ...d, image: e.target.value }))}
+                            placeholder="Paste image URL or upload below"
+                        />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="mt-1 text-xs"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+                                const t = toast.loading('Uploading...')
+                                try {
+                                    const { uploadPublicImage } = await import('../../lib/storage')
+                                    const url = await uploadPublicImage({ file })
+                                    setDraftRope((d) => ({ ...d, image: url }))
+                                    toast.success('Uploaded', { id: t })
+                                } catch { toast.error('Failed', { id: t }) }
+                                finally { e.target.value = '' }
+                            }}
+                        />
+                        {draftRope.image && (
+                            <img src={draftRope.image} className="mt-2 h-24 w-full rounded-xl object-cover" alt="preview" />
+                        )}
+                    </label>
                     <Button onClick={saveRope} className="mt-2">Save Rope Type</Button>
                 </div>
             </Modal>
@@ -544,6 +577,19 @@ export default function AdminCustomize() {
                             value={draftAccessory.priceAdd}
                             onChange={(e) => setDraftAccessory((d) => ({ ...d, priceAdd: Number(e.target.value) }))}
                         />
+                    </label>
+                    <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Compatible Rope Type</span>
+                        <select
+                            className="lux-ring rounded-xl border border-white/20 bg-white/50 px-4 py-2 text-sm"
+                            value={draftAccessory.ropeType || 'all'}
+                            onChange={(e) => setDraftAccessory((d) => ({ ...d, ropeType: e.target.value }))}
+                        >
+                            <option value="all">All rope types</option>
+                            {ropes.map((r) => (
+                                <option key={r.id} value={r.id}>{r.name}</option>
+                            ))}
+                        </select>
                     </label>
                     <label className="grid gap-1.5">
                         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Image Icon</span>
