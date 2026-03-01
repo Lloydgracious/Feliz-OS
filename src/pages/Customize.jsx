@@ -73,7 +73,12 @@ export default function Customize() {
   }, [active, selectedKnots, selectedColors, rope])
 
   const summaryLabel = useMemo(() => {
-    return selectedKnots.map(k => k.name).join(' + ') || '—'
+    if (selectedKnots.length === 0) return '—'
+    const counts = {}
+    selectedKnots.forEach(k => { counts[k.name] = (counts[k.name] || 0) + 1 })
+    return Object.entries(counts)
+      .map(([name, cnt]) => cnt > 1 ? `${name} ×${cnt}` : name)
+      .join(' + ')
   }, [selectedKnots])
 
   const colorsLabel = useMemo(() => {
@@ -122,27 +127,48 @@ export default function Customize() {
                     <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 01</div>
                     <h2 className="mt-2 text-3xl text-slate-900">Choose 2 to 4 knots</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Select at least two signature knots (up to four) to create your unique pattern.
+                      Select 2–4 knot slots. You can pick the same knot multiple times!
                     </p>
+
+                    {/* Slot counter */}
+                    <div className="mt-4 flex items-center gap-2">
+                      {Array.from({ length: 4 }).map((_, i) => {
+                        const filled = i < selectedKnots.length
+                        return (
+                          <div
+                            key={i}
+                            className={`h-2.5 flex-1 rounded-full transition-all duration-300 ${filled ? 'bg-feliz-blue' : 'bg-slate-200'}`}
+                          />
+                        )
+                      })}
+                      <span className="ml-2 text-xs font-semibold text-slate-600">{selectedKnots.length}/4</span>
+                    </div>
 
                     <div className="mt-6">
                       {knotStyles.length > 0 ? (
                         <div className="grid gap-5 sm:grid-cols-2">
                           {knotStyles.map((k) => {
-                            const isSelected = selectedKnots.some(pk => pk.id === k.id)
+                            const count = selectedKnots.filter(pk => pk.id === k.id).length
                             return (
                               <KnotCard
                                 key={k.id}
                                 knot={k}
-                                selected={isSelected}
-                                onSelect={() => {
-                                  if (isSelected) {
-                                    setSelectedKnots(prev => prev.filter(p => p.id !== k.id))
-                                  } else if (selectedKnots.length < 4) {
+                                count={count}
+                                onAdd={() => {
+                                  if (selectedKnots.length < 4) {
                                     setSelectedKnots(prev => [...prev, k])
                                   } else {
-                                    toast.error('Maximum 4 knots allowed')
+                                    toast.error('Maximum 4 knot slots allowed')
                                   }
+                                }}
+                                onRemove={() => {
+                                  // remove only the last occurrence of this knot
+                                  setSelectedKnots(prev => {
+                                    const idx = [...prev].reverse().findIndex(p => p.id === k.id)
+                                    if (idx === -1) return prev
+                                    const realIdx = prev.length - 1 - idx
+                                    return prev.filter((_, i) => i !== realIdx)
+                                  })
                                 }}
                                 rightNote={formatAddonMMK(k.priceAdd)}
                               />
