@@ -66,7 +66,7 @@ export default function Customize() {
   }, [baseCustomizationPrice, selectedKnots, selectedColors, rope, accessory])
 
   const canNext = useMemo(() => {
-    if (active === 0) return selectedKnots.length >= 2 && selectedKnots.length <= 4
+    if (active === 0) return selectedKnots.length >= 1 && selectedKnots.length <= 4
     if (active === 1) return selectedColors.length >= 1 && selectedColors.length <= 4
     if (active === 2) return !!rope
     return true
@@ -125,9 +125,9 @@ export default function Customize() {
                 {active === 0 && (
                   <div>
                     <div className="text-xs font-semibold tracking-[0.2em] text-feliz-blue">STEP 01</div>
-                    <h2 className="mt-2 text-3xl text-slate-900">Choose 2 to 4 knots</h2>
+                    <h2 className="mt-2 text-3xl text-slate-900">Choose 1 to 4 knots</h2>
                     <p className="mt-2 text-sm text-slate-700">
-                      Select 2–4 knot slots. You can pick the same knot multiple times!
+                      Select 1–4 knot slots. You can pick the same knot multiple times!
                     </p>
 
                     {/* Slot counter */}

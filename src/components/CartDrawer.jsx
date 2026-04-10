@@ -87,22 +87,22 @@ export default function CartDrawer() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-white/15 px-5 py-6 backdrop-blur-md">
+            <div className="shrink-0 border-t border-white/15 px-5 py-6 backdrop-blur-xl bg-white/40">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-700">Total</div>
-                <div className="text-base font-semibold text-slate-900">{formatMMK(subtotal)}</div>
+                <div className="text-sm font-medium text-slate-600">Total</div>
+                <div className="text-lg font-bold text-slate-900">{formatMMK(subtotal)}</div>
               </div>
               <div className="mt-4 flex gap-3">
                 <Link
                   to="/checkout"
                   onClick={closeCart}
-                  className="w-full rounded-2xl bg-feliz-blue px-4 py-3 text-center text-sm font-semibold text-white hover:brightness-105"
+                  className="w-full rounded-2xl lux-btn-checkout px-4 py-3.5 text-center text-sm font-bold active:scale-[0.98]"
                 >
                   Checkout
                 </Link>
                 <button
                   onClick={closeCart}
-                  className="w-full rounded-2xl border border-white/25 bg-white/35 px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-white/45"
+                  className="w-full rounded-2xl lux-btn-continue px-4 py-3.5 text-sm font-bold active:scale-[0.98]"
                 >
                   Continue
                 </button>
